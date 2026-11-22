@@ -1,0 +1,18 @@
+<%- include('_head') %><h1>Administration</h1>
+<div class="dash"><div class="stat"><b><%= stats.users %></b>membres</div><div class="stat"><b><%= stats.guides %></b>guides publiés</div>
+<div class="stat"><b><%= stats.pending %></b>à valider</div><div class="stat"><b><%= stats.comments %></b>commentaires</div></div>
+<% if (user.role === 'admin') { %><div class="box"><h2 style="margin-top:0">Catégories et sous-catégories</h2>
+<form method="post" action="/admin/category" enctype="multipart/form-data" class="row"><input name="name" placeholder="Nom" required maxlength="60"><input name="icon_text" placeholder="Icône emoji (ex : 📱)" maxlength="12">
+<select name="parent_id"><option value="">Catégorie principale</option><% cats.forEach(c => { %><option value="<%= c.id %>">Sous-catégorie de : <%= c.label %></option><% }) %></select><label class="mut small" style="margin:0;font-weight:400;align-self:center">Ou image d'icône : <input type="file" name="icon_file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button>Ajouter</button></form>
+<% cats.forEach(c => { %><div style="padding:.35rem 0 .35rem <%= c.depth * 24 %>px"><%= c.depth ? '↳ ' : '' %><%- include('_ico', { c, small: true }) %><%= c.name %>
+<details style="display:inline-block;margin:0 .5rem"><summary class="mut small" style="cursor:pointer">Icône</summary>
+<form method="post" action="/admin/category/<%= c.id %>/icon" enctype="multipart/form-data" class="row" style="margin:.4rem 0"><input name="icon_text" placeholder="Emoji" maxlength="12" style="max-width:110px"><input type="file" name="icon_file" accept="image/jpeg,image/png,image/webp,image/gif"><label style="margin:0;font-weight:400"><input type="checkbox" name="remove_icon"> Retirer</label><button class="small">Enregistrer</button></form></details>
+<form class="inline" method="post" action="/admin/category/<%= c.id %>/delete" onsubmit="return confirm('Supprimer cette catégorie ? Ses sous-catégories deviendront des catégories principales.')"><button class="danger small" style="padding:.05rem .5rem">Supprimer</button></form></div><% }) %></div><% } %>
+<div class="box scroll"><h2 style="margin-top:0">Utilisateurs</h2><table><tr><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Suspendu</th><th></th></tr>
+<% users.forEach(u => { %><tr><td><%= u.name %></td><td><%= u.email %></td>
+<% if (user.role === 'admin' && u.id !== user.id) { %><td><select name="role" form="f<%= u.id %>"><% Object.keys(roles).forEach(r => { %><option value="<%= r %>" <%= u.role === r ? 'selected' : '' %>><%= roles[r] %></option><% }) %></select></td>
+<td><input type="checkbox" name="banned" form="f<%= u.id %>" <%= u.banned ? 'checked' : '' %>></td><td><form id="f<%= u.id %>" method="post" action="/admin/user/<%= u.id %>"><button class="small">Enregistrer</button></form></td>
+<% } else { %><td><%= roles[u.role] %></td><td><%= u.banned ? 'oui' : 'non' %></td><td><% if (user.role === 'moderator' && u.role === 'reader') { %><form class="inline" method="post" action="/admin/user/<%= u.id %>/ban"><button class="secondary small"><%= u.banned ? 'Réactiver' : 'Suspendre' %></button></form><% } %></td><% } %></tr><% }) %></table></div>
+<div class="box"><h2 style="margin-top:0">Derniers commentaires</h2><% if (!comments.length) { %><p class="mut">Aucun commentaire.</p><% } %><% comments.forEach(c => { %><p><b><%= c.name %></b> : <%= c.body.slice(0, 120) %> <a href="/guide/<%= c.guide_id %>">voir</a>
+<form class="inline" method="post" action="/comment/<%= c.id %>/delete"><button class="danger small">Supprimer</button></form></p><% }) %></div>
+<%- include('_foot') %>

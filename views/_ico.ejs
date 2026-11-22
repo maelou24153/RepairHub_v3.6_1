@@ -1,0 +1,1 @@
+<% const ic = c.icon || ''; %><span class="sq<%= locals.small ? ' sm' : '' %>" style="--h:<%= ((c.id || 0) * 47) % 360 %>"><% if (ic.indexOf('/uploads/') === 0) { %><img src="<%= ic %>" alt=""><% } else if (ic) { %><span class="emo"><%= ic %></span><% } else { %><%= String(c.name || '?').charAt(0).toUpperCase() %><% } %></span>

@@ -1,0 +1,6 @@
+<%- include('_head') %>
+<div class="crumbs"><a href="/">Accueil</a> › Hashtag</div><h1>#<%= tag %></h1>
+<% if (!guides.length) { %><p class="mut">Aucun guide publié avec ce hashtag pour le moment.</p><% } %>
+<div class="grid"><% guides.forEach(g => { %><%- include('_card', { g }) %><% }) %></div>
+<% if (tags && tags.length) { %><h2>Autres hashtags</h2><div class="cloud"><% tags.forEach(t => { %><a class="hashtag" href="/tag/<%= t.tag %>">#<%= t.tag %> <span><%= t.n %></span></a><% }) %></div><% } %>
+<%- include('_foot') %>

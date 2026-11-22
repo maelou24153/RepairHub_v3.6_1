@@ -1,0 +1,4 @@
+<%- include('_head') %><div class="authbox"><h1>Bienvenue</h1><p class="mut">Première utilisation : créez le compte administrateur.</p>
+<form method="post"><label>Email</label><input type="email" name="email" required><label>Pseudo</label><input name="name" maxlength="40" required>
+<label>Mot de passe (8 caractères minimum)</label><input type="password" name="password" minlength="8" required>
+<% if (needCode) { %><label>Code d'installation</label><input name="code" required><% } %><p><button>Créer l'administrateur</button></p></form></div><%- include('_foot') %>

@@ -1,0 +1,3 @@
+<%- include('_head') %><div class="authbox"><h1>Mon compte</h1><p class="mut"><%= user.name %> · <%= roles[user.role] %></p>
+<form method="post"><label>Mot de passe actuel</label><input type="password" name="old_password" required>
+<label>Nouveau mot de passe</label><input type="password" name="new_password" minlength="8" required><p><button>Changer le mot de passe</button></p></form></div><%- include('_foot') %>

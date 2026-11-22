@@ -1,0 +1,8 @@
+<%- include('_head') %>
+<div class="crumbs"><a href="/">Accueil</a><% crumbs.forEach(x => { %> › <a href="/cat/<%= x.id %>"><%= x.name %></a><% }) %></div>
+<h1 style="display:flex;align-items:center;gap:.8rem"><%- include('_ico', { c }) %><span><%= c.name %></span></h1>
+<% if (subs.length) { %><h2>Sous-catégories</h2><div class="grid"><% subs.forEach(x => { %><a class="tile" href="/cat/<%= x.id %>"><%- include('_ico', { c: x }) %><span><h3><%= x.name %></h3><span class="subs"><%= x.n %> guide(s)</span></span></a><% }) %></div><% } %>
+<h2>Guides</h2><div class="sorts">Trier : <a class="<%= sort === 'recent' ? 'on' : '' %>" href="?sort=recent">Récents</a><a class="<%= sort === 'popular' ? 'on' : '' %>" href="?sort=popular">Populaires</a></div>
+<% if (!guides.length) { %><p class="mut">Aucun guide dans cette catégorie pour le moment.</p><% } %>
+<div class="grid"><% guides.forEach(g => { %><%- include('_card', { g }) %><% }) %></div>
+<%- include('_foot') %>

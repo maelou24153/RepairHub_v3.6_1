@@ -1,0 +1,9 @@
+</main><footer><a href="/diag">Diagnostic de panne</a> · RepairHub · guides de réparation partagés par la communauté et validés par des modérateurs</footer>
+<nav class="tabbar" aria-label="Navigation principale">
+<a href="/" data-tab="/"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Accueil</span></a>
+<a href="/diag" data-tab="/diag"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Diagnostic</span></a>
+<% if (user && ['creator','moderator','admin'].includes(user.role)) { %><a href="/new" data-tab="/new,/mine,/edit"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Créer</span></a><% } %>
+<% if (user && ['moderator','admin'].includes(user.role)) { %><a href="/moderation" data-tab="/moderation"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg><span>Validation<% if (locals.pending) { %><i class="count"><%= pending %></i><% } %></span></a><% } %>
+<a href="<%= user ? '/account' : '/login' %>" data-tab="/account,/login,/register,/admin"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span><%= user ? 'Compte' : 'Connexion' %></span></a>
+</nav>
+<div id="lb" hidden><img alt=""></div><script src="/site.js"></script></body></html>

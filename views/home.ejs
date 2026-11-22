@@ -1,0 +1,18 @@
+<%- include('_head') %>
+<section class="hero"><div class="wrap"><h1>Apprenez à réparer, pas à jeter.</h1><p>Des guides pas à pas avec photos et vidéos, rédigés par la communauté et relus par des modérateurs.</p>
+<form action="/" class="herosearch"><input name="s" type="search" placeholder="Que voulez-vous réparer ?" value="<%= s %>"><button>Rechercher</button></form>
+<p style="margin:1.1rem 0 0"><a class="btn secondary" href="/diag">Diagnostiquer une panne</a><span class="mut small" style="display:block;margin-top:.4rem">Répondez à quelques questions : on vous indique la cause probable et les guides utiles.</span></p>
+<div class="stats"><div><b><%= stats.guides %></b><span>guides</span></div><div><b><%= stats.members %></b><span>membres</span></div><div><b><%= stats.cats %></b><span>catégories</span></div></div></div></section>
+<main class="wrap" id="contenu"><% if (locals.msg) { %><div class="notice"><%= msg %></div><% } %>
+<% if (results) { %><h2 style="margin-top:0">Résultats pour « <%= s %> »</h2><% if (!results.length) { %><p class="mut">Aucun guide trouvé.</p><% } %>
+<div class="grid"><% results.forEach(g => { %><%- include('_card', { g }) %><% }) %></div>
+<% } else { %>
+<h2 style="margin-top:0">Catégories</h2>
+<% if (!tops.length) { %><p class="mut">Aucune catégorie pour le moment. L'administrateur peut en créer depuis la page Administration.</p><% } %>
+<div class="grid"><% tops.forEach(c => { %><a class="tile" href="/cat/<%= c.id %>"><%- include('_ico', { c }) %>
+<span><h3><%= c.name %></h3><span class="subs"><%= c.n %> guide(s)<%= c.subs.length ? ' · ' + c.subs.length + ' sous-catégorie(s)' : '' %></span></span></a><% }) %></div>
+<% if (tags && tags.length) { %><h2>Hashtags populaires</h2><div class="cloud"><% tags.forEach(t => { %><a class="hashtag" href="/tag/<%= t.tag %>">#<%= t.tag %> <span><%= t.n %></span></a><% }) %></div><% } %>
+<% if (popular.length) { %><h2>Les plus consultés</h2><div class="grid"><% popular.forEach(g => { %><%- include('_card', { g }) %><% }) %></div><% } %>
+<h2>Derniers guides</h2><% if (!latest.length) { %><p class="mut">Aucun guide publié pour le moment.</p><% } %>
+<div class="grid"><% latest.forEach(g => { %><%- include('_card', { g }) %><% }) %></div>
+<% } %><%- include('_foot') %>

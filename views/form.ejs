@@ -1,0 +1,25 @@
+<%- include('_head') %>
+<form id="guideform" method="post" enctype="multipart/form-data" action="<%= g.id ? '/edit/' + g.id : '/new' %>">
+<input type="hidden" name="order" id="order">
+<div class="editor"><div>
+<h1><%= g.id ? 'Modifier le guide' : 'Nouveau guide' %></h1>
+<% if (user.role === 'creator') { %><div class="banner warnb">Votre guide sera publié après validation par un modérateur.</div><% } %>
+<input class="big" name="title" required maxlength="150" placeholder="Titre (ex : Remplacer la batterie d'un téléphone)" value="<%= g.title || '' %>">
+<label>Introduction</label><textarea name="intro" rows="3" maxlength="1500" placeholder="En quelques phrases : que va-t-on réparer, et pourquoi ?"><%= g.intro || '' %></textarea>
+<h2>Étapes</h2><div id="steps"><% steps.forEach((s, i) => { %><%- include('_step', { key: s.id ? 'e' + s.id : 'n' + (i + 1), s }) %><% }) %></div>
+<button type="button" id="addstep" class="secondary">+ Ajouter une étape</button>
+<template id="tpl"><%- include('_step', { key: '__K__', s: {} }) %></template>
+</div>
+<aside class="side"><div class="box"><h3>Publication</h3>
+<label style="margin-top:0">Catégorie</label><select name="category_id" style="width:100%"><option value="">Sans catégorie</option>
+<% cats.forEach(c => { %><option value="<%= c.id %>" <%= g.category_id == c.id ? 'selected' : '' %>><%= c.label %></option><% }) %></select>
+<label>Difficulté</label><select name="difficulty" style="width:100%"><% ['Facile','Moyen','Difficile'].forEach(d => { %><option <%= (g.difficulty || 'Moyen') === d ? 'selected' : '' %>><%= d %></option><% }) %></select>
+<label>Durée (minutes)</label><input type="number" name="duration" min="0" max="1440" style="width:100%" value="<%= g.duration || '' %>">
+<label>Image de couverture</label>
+<% if (g.image) { %><img class="coverprev" src="<%= g.image %>" alt=""><label style="font-weight:400"><input type="checkbox" name="remove_cover"> Retirer la couverture</label><% } %>
+<div id="coverpreview"></div><input type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif" style="width:100%">
+<label>Outils et pièces (un par ligne)</label><textarea name="tools" rows="5" placeholder="Tournevis cruciforme&#10;Spatule en plastique"><%= g.tools || '' %></textarea>
+<label>Hashtags (pour la recherche)</label><input name="tags" maxlength="200" style="width:100%" placeholder="#batterie #iphone #ecran" value="<%= (g.tags || '').split(',').filter(Boolean).map(x => '#' + x).join(' ') %>">
+<p style="margin-bottom:0"><button type="submit" style="width:100%"><%= g.id ? 'Enregistrer' : 'Envoyer le guide' %></button></p></div></aside>
+</div></form><script src="/editor.js"></script>
+<%- include('_foot') %>

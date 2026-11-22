@@ -1,0 +1,13 @@
+<%- include('_head') %><h1>Guides à valider (<%= guides.length %>)</h1>
+<% if (!guides.length && !diags.length) { %><p class="mut">Rien à valider pour le moment.</p><% } %>
+<% guides.forEach(g => { %><div class="box"><div class="small"><span class="tag"><%= g.cat || 'Divers' %></span><span class="tag d-<%= g.difficulty %>"><%= g.difficulty %></span><span class="mut">par <%= g.author %></span></div>
+<h3 style="margin-top:.5rem"><a href="/guide/<%= g.id %>"><%= g.title %></a></h3><p class="mut"><%= (g.intro || '').slice(0, 220) %></p>
+<a class="btn secondary small" href="/guide/<%= g.id %>">Lire le guide</a>
+<form class="inline" method="post" action="/moderation/<%= g.id %>/approve"><button class="okb small">Valider</button></form>
+<form class="inline" method="post" action="/moderation/<%= g.id %>/reject"><input name="note" placeholder="Motif du refus"> <button class="danger small">Refuser</button></form></div><% }) %>
+<% if (diags.length) { %><h2>Outils de diagnostic à valider (<%= diags.length %>)</h2><% diags.forEach(d => { %><div class="box"><div class="small"><span class="tag"><%= d.cat || 'Divers' %></span><span class="mut">par <%= d.author %></span></div>
+<h3 style="margin-top:.5rem"><a href="/diag/<%= d.id %>"><%= d.title %></a></h3><p class="mut"><%= (d.intro || '').slice(0, 220) %></p>
+<a class="btn secondary small" href="/diag/<%= d.id %>">Tester l'outil</a>
+<form class="inline" method="post" action="/moderation/diag/<%= d.id %>/approve"><button class="okb small">Valider</button></form>
+<form class="inline" method="post" action="/moderation/diag/<%= d.id %>/reject"><input name="note" placeholder="Motif du refus"> <button class="danger small">Refuser</button></form></div><% }) %><% } %>
+<%- include('_foot') %>

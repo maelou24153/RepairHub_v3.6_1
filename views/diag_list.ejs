@@ -1,0 +1,6 @@
+<%- include('_head') %>
+<h1>Diagnostic de panne</h1><p class="lead">Choisissez votre appareil ou votre problème, répondez à quelques questions : l'outil vous indique la cause la plus probable et les guides pour réparer.</p>
+<% if (user && ['creator','moderator','admin'].includes(user.role)) { %><p><a class="btn secondary small" href="/diag/new">Créer un outil de diagnostic</a></p><% } %>
+<% if (!diags.length) { %><p class="mut">Aucun outil de diagnostic pour le moment.</p><% } %>
+<div class="grid"><% diags.forEach(d => { %><a class="tile" href="/diag/<%= d.id %>"><%- include('_ico', { c: { id: d.id, name: d.title, icon: '' } }) %><span><h3><%= d.title %></h3><span class="subs"><%= (d.intro || '').slice(0, 90) %></span></span></a><% }) %></div>
+<%- include('_foot') %>

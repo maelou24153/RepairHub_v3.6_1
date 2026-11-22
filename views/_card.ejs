@@ -1,0 +1,7 @@
+<% const src = g.image || (g.thumb ? '/uploads/' + g.thumb : ''); %>
+<a class="gcard" href="/guide/<%= g.id %>"><div class="img"><% if (src) { %><img src="<%= src %>" alt="" loading="lazy"><% } else { %><%- include('_ico', { c: { id: g.category_id, name: g.cat || g.title, icon: g.cat_icon } }) %><% } %></div>
+<div class="body"><div class="small"><span class="tag"><%= g.cat || 'Divers' %></span><span class="tag d-<%= g.difficulty %>"><%= g.difficulty %></span>
+<% if (g.status !== 'approved') { %><span class="tag st-<%= g.status %>"><%= g.status === 'pending' ? 'En attente' : 'Refusé' %></span><% } %></div>
+<h3 style="margin-top:.5rem"><%= g.title %></h3><p><%= (g.intro || '').slice(0, 110) %></p>
+<% const gt = (g.tags || '').split(',').filter(Boolean).slice(0, 3); if (gt.length) { %><div class="small" style="color:var(--ac);margin:-.2rem 0 .5rem"><%= gt.map(x => '#' + x).join(' ') %></div><% } %>
+<div class="mut small"><%= g.author %><%= g.duration ? ' · ' + g.duration + ' min' : '' %> · <%= g.views %> vue(s)</div></div></a>

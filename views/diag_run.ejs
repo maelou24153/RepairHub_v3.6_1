@@ -1,0 +1,28 @@
+<%- include('_head') %>
+<% const staff = user && ['admin','moderator'].includes(user.role); const own = user && user.id === d.author_id; %>
+<div class="crumbs"><a href="/diag">Diagnostic de panne</a> › <%= d.title %></div>
+<% if (d.status === 'pending') { %><div class="banner warnb"><b>En attente de validation.</b> Cet outil n'est pas encore public.
+<% if (staff) { %><form class="inline" method="post" action="/moderation/diag/<%= d.id %>/approve"><button class="okb">Valider</button></form>
+<form class="inline" method="post" action="/moderation/diag/<%= d.id %>/reject"><input name="note" placeholder="Motif du refus"> <button class="danger">Refuser</button></form><% } %></div><% } %>
+<% if (d.status === 'rejected') { %><div class="banner badb"><b>Outil refusé</b><%= d.reject_note ? ' : ' + d.reject_note : '' %>. Modifiez-le pour le soumettre à nouveau.</div><% } %>
+<h1><%= d.title %></h1>
+<% if (!trail.length && d.intro) { %><p class="lead"><%= d.intro %></p><% } %>
+<% if (invalid) { %><div class="notice">Ce chemin de réponses n'est pas valide : on recommence depuis le début.</div><% } %>
+<% if (trail.length) { %><ol class="trail"><% trail.forEach(t => { %><li><span class="mut"><%= t.q %></span><b><%= t.a %></b></li><% }) %></ol><% } %>
+<div class="qcard">
+<% if (!result) { %><div class="qnum">Question <%= trail.length + 1 %></div><h2><%= node.text %></h2>
+<div class="opts"><% node.options.forEach((o, i) => { %><a class="opt" href="?p=<%= base.concat([node.id + '.' + i]).join(',') %>"><%= o.label %></a><% }) %></div>
+<% } else { %><div class="qnum ok">Diagnostic probable</div><p class="verdict txt"><%= node.text %></p>
+<% if (node.tags.length) { %><div><% node.tags.forEach(t => { %><a class="hashtag" href="/tag/<%= t %>">#<%= t %></a><% }) %></div><% } %><% } %>
+</div>
+<p><% if (trail.length) { %><a class="btn secondary small" href="?p=<%= base.slice(0, -1).join(',') %>">← Question précédente</a> <a class="btn secondary small" href="?">Recommencer</a><% } %></p>
+<% if (result && articles.length) { %><h2>Articles de réparation recommandés</h2>
+<% const ag = articles.filter(a => a.kind === 'guide'), au = articles.filter(a => a.kind === 'url'); %>
+<% if (ag.length) { %><div class="grid"><% ag.forEach(a => { %><%- include('_card', { g: a.g }) %><% }) %></div><% } %>
+<% if (au.length) { %><ul class="files"><% au.forEach(a => { %><li><a href="<%= a.url %>" target="_blank" rel="noopener noreferrer nofollow"><span class="fext"><%= a.host %></span><span><%= a.title %></span><small>Lire ↗</small></a></li><% }) %></ul><% } %><% } %>
+<% if (result && (guides.length || !articles.length)) { %><h2><%= articles.length ? 'Autres guides sur ce sujet' : 'Guides pour réparer' %></h2>
+<% if (guides.length) { %><div class="grid"><% guides.forEach(g => { %><%- include('_card', { g }) %><% }) %></div>
+<% } else { %><p class="mut">Aucun guide ne correspond encore à ce diagnostic.<% if (node.tags.length) { %> Essayez la recherche : <% node.tags.forEach(t => { %><a href="/?s=%23<%= t %>">#<%= t %></a> <% }) %><% } %></p><% } %><% } %>
+<% if (staff || (own && user.role === 'creator')) { %><p class="small" style="margin-top:2rem"><a href="/diag/<%= d.id %>/edit">Modifier cet outil</a>
+<form class="inline" method="post" action="/diag/<%= d.id %>/delete" onsubmit="return confirm('Supprimer cet outil ?')"> <button class="danger small">Supprimer</button></form></p><% } %>
+<%- include('_foot') %>

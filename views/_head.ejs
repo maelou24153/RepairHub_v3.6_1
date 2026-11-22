@@ -1,0 +1,19 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title><%= locals.title ? title + ' · ' : '' %>RepairHub</title><meta name="theme-color" content="#0b62c4">
+<link rel="icon" href="/favicon.ico?v=3" sizes="32x32"><link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
+<meta name="color-scheme" content="light dark"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css"></head><body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="bar"><div class="wrap barin">
+<a class="logo" href="/" aria-label="RepairHub, accueil"><img src="/logo.svg" width="34" height="34" alt=""><span><b>Repair</b>Hub</span></a>
+<nav class="nav"><a class="navlink hide-sm" href="/diag">Diagnostic</a><% if (user) { %>
+<% if (['moderator','admin'].includes(user.role)) { %><a class="navlink hide-sm" href="/moderation">Validation<% if (locals.pending) { %><span class="count"><%= pending %></span><% } %></a><% } %>
+<% if (['creator','moderator','admin'].includes(user.role)) { %><a class="btn small hide-sm" href="/new">Créer un guide</a><% } %>
+<details class="menu"><summary aria-label="Menu du compte"><span class="avatar"><%= user.name.charAt(0).toUpperCase() %></span><span class="uname hide-sm"><%= user.name %></span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
+<div class="pop"><div class="who"><b><%= user.name %></b><span><%= roles[user.role] %></span></div>
+<% if (['creator','moderator','admin'].includes(user.role)) { %><a href="/mine">Mes guides</a><% } %>
+<% if (['moderator','admin'].includes(user.role)) { %><a href="/admin">Administration</a><% } %>
+<a href="/account">Mon compte</a><form method="post" action="/logout"><button class="linkbtn">Déconnexion</button></form></div></details>
+<% } else { %><a class="navlink" href="/login">Connexion</a><a class="btn small" href="/register">S'inscrire</a><% } %></nav>
+<form class="hsearch" action="/" role="search"><input name="s" type="search" placeholder="Rechercher un guide ou #hashtag" aria-label="Rechercher un guide" value="<%= locals.s || '' %>"></form>
+</div></header>
+<% if (!locals.hero) { %><main class="wrap" id="contenu"><% if (locals.msg) { %><div class="notice"><%= msg %></div><% } %><% } %>

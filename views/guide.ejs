@@ -1,0 +1,33 @@
+<%- include('_head') %>
+<% const staff = user && ['admin','moderator'].includes(user.role); const own = user && user.id === g.author_id; %>
+<div class="crumbs"><a href="/">Accueil</a><% crumbs.forEach(x => { %> › <a href="/cat/<%= x.id %>"><%= x.name %></a><% }) %></div>
+<% if (g.status === 'pending') { %><div class="banner warnb"><b>En attente de validation.</b> Ce guide n'est pas encore public.
+<% if (staff) { %><form class="inline" method="post" action="/moderation/<%= g.id %>/approve"><button class="okb">Valider</button></form>
+<form class="inline" method="post" action="/moderation/<%= g.id %>/reject"><input name="note" placeholder="Motif du refus"> <button class="danger">Refuser</button></form><% } %></div><% } %>
+<% if (g.status === 'rejected') { %><div class="banner badb"><b>Guide refusé</b><%= g.reject_note ? ' : ' + g.reject_note : '' %>. Modifiez-le pour le soumettre à nouveau.</div><% } %>
+<h1><%= g.title %></h1>
+<div class="small mut"><span class="tag d-<%= g.difficulty %>"><%= g.difficulty %></span><%= g.duration ? 'Durée : ' + g.duration + ' min · ' : '' %><%= g.views %> vue(s) · par <a href="/user/<%= g.author_id %>"><%= g.author %></a> · <%= String(g.created_at).slice(0, 10) %></div>
+<% const gtags = (g.tags || '').split(',').filter(Boolean); if (gtags.length) { %><div style="margin-top:.6rem"><% gtags.forEach(t => { %><a class="hashtag" href="/tag/<%= t %>">#<%= t %></a><% }) %></div><% } %>
+<div class="actions" style="margin:.8rem 0">
+<% if (staff || (own && user.role === 'creator')) { %><a class="btn secondary small" href="/edit/<%= g.id %>">Modifier</a><% } %>
+<% if (staff || own) { %><form class="inline" method="post" action="/delete/<%= g.id %>" onsubmit="return confirm('Supprimer ce guide ?')"><button class="danger small">Supprimer</button></form><% } %></div>
+<div class="cols"><div>
+<% if (g.image) { %><img class="cover zoom" src="<%= g.image %>" alt=""><% } %>
+<% if (g.intro) { %><p class="lead"><%= g.intro %></p><% } %>
+<% if (tools.length) { %><div class="box tools-inline"><h3>Outils et pièces</h3><ul><% tools.forEach(t => { %><li><%= t %></li><% }) %></ul></div><% } %>
+<% steps.forEach((s, i) => { %><section class="step" id="etape-<%= i + 1 %>"><div class="stepnum"><%= i + 1 %></div><div><h2><%= s.title || 'Étape ' + (i + 1) %></h2><div class="txt"><%= s.body %></div>
+<% const it = s.media || [], gal = it.filter(m => m.kind === 'image' || m.kind === 'video' || (m.kind === 'link' && linkKind(m.url) !== 'link')), docs = it.filter(m => m.kind === 'file'), links = it.filter(m => m.kind === 'link' && linkKind(m.url) === 'link'); %>
+<% if (gal.length) { %><div class="media <%= gal.length > 1 ? 'multi' : '' %>"><% gal.forEach(m => { %><% if (m.kind === 'link') { %><% if (linkKind(m.url) === 'image') { %><img class="zoom" src="<%= m.url %>" alt="<%= m.name %>" loading="lazy" referrerpolicy="no-referrer"><% } else { %><video controls preload="metadata" playsinline src="<%= m.url %>"></video><% } %><% } else if (m.kind === 'image') { %><img class="zoom" src="/uploads/<%= m.file %>" alt="" loading="lazy"><% } else { %><video controls preload="metadata" playsinline src="/uploads/<%= m.file %>"></video><% } %><% }) %></div><% } %>
+<% if (docs.length) { %><ul class="files"><% docs.forEach(m => { %><li><a href="/download/<%= m.id %>"><span class="fext"><%= String(m.name || m.file).split('.').pop().slice(0, 4).toUpperCase() %></span><span><%= m.name || m.file %></span><small><%= fmtSize(m.size) %></small></a></li><% }) %></ul><% } %>
+<% if (links.length) { %><ul class="files"><% links.forEach(m => { %><li><a href="<%= m.url %>" target="_blank" rel="noopener noreferrer nofollow"><span class="fext"><%= linkHost(m.url) %></span><span><%= m.name %></span><small>Ouvrir ↗</small></a></li><% }) %></ul><% } %></div></section><% }) %>
+<% if (!steps.length) { %><p class="mut">Ce guide n'a pas encore d'étapes.</p><% } %>
+<% if (g.status === 'approved') { %><div class="comments"><h2>Commentaires (<%= comments.length %>)</h2>
+<% comments.forEach(c => { %><div class="comment"><b><%= c.name %></b> <span class="mut small"><%= String(c.created_at).slice(0, 16) %></span>
+<% if (staff) { %><form class="inline" method="post" action="/comment/<%= c.id %>/delete"><button class="danger small">Supprimer</button></form><% } %><p><%= c.body %></p></div><% }) %>
+<% if (user) { %><form method="post" action="/guide/<%= g.id %>/comment"><textarea name="body" rows="3" maxlength="2000" required placeholder="Votre commentaire"></textarea><p><button>Publier</button></p></form>
+<% } else { %><p><a href="/login">Connectez-vous</a> ou <a href="/register">créez un compte</a> pour commenter.</p><% } %></div><% } %>
+</div>
+<aside class="side"><% if (steps.length) { %><div class="box toc"><h3>Sommaire</h3><ol><% steps.forEach((s, i) => { %><li><a href="#etape-<%= i + 1 %>"><%= s.title || 'Étape ' + (i + 1) %></a></li><% }) %></ol></div><% } %>
+<% if (tools.length) { %><div class="box tools-side"><h3>Outils et pièces</h3><ul><% tools.forEach(t => { %><li><%= t %></li><% }) %></ul></div><% } %>
+<div class="noprint"><button class="secondary small" data-copy>Copier le lien</button> <button class="secondary small" data-print>Imprimer</button></div></aside></div>
+<%- include('_foot') %>

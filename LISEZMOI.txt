@@ -1,0 +1,157 @@
+REPAIRHUB V3
+============
+Guides de réparation avec photos et vidéos, catégories et sous-catégories,
+validation des guides par les modérateurs et les administrateurs.
+Un seul service Node.js, base de données = un fichier (SQLite), aucun service externe.
+
+--- LANCER SUR VOTRE ORDINATEUR ---
+1. Installez Node.js 22.13 ou plus (version LTS actuelle) : https://nodejs.org
+2. Dans ce dossier :   npm install     puis     npm start
+3. Ouvrez http://localhost:3000
+   Autre appareil du réseau : http://ADRESSE-IP-DE-VOTRE-PC:3000
+4. Au premier accès : création de l'administrateur.
+Données : dossier "data" (base site.db + dossier uploads avec photos/vidéos/fichiers). Sauvegardez-le.
+La base utilise SQLite intégré à Node : aucun module natif à compiler (l'ancien plantage
+"Assertion failed: (env) != nullptr" venait du module better-sqlite3 avec un Node récent).
+
+--- METTRE SUR RENDER (Web Service uniquement) ---
+1. Envoyez le contenu de ce dossier à la RACINE d'un dépôt GitHub
+   (package.json, server.js, db.js visibles en haut du dépôt).
+2. Render -> New + -> Web Service -> votre dépôt -> Connect
+     Language Node | Branch main | Root Directory (vide)
+     Build Command : npm install | Start Command : npm start | Instance Type : Free
+3. Variables d'environnement :
+     SESSION_SECRET = longue suite de caractères au hasard
+     SETUP_CODE     = code secret (recommandé : protège la page de création d'admin)
+   Ou, pour ne plus passer par la page de création (recommandé sur Render gratuit) :
+     ADMIN_EMAIL, ADMIN_PASSWORD (8 caractères min.), ADMIN_NAME (facultatif)
+   Facultatif : MAX_UPLOAD_MB (taille max par fichier, 60 par défaut)
+4. Create Web Service, attendez "Live".
+
+--- METTRE A JOUR DEPUIS UNE ANCIENNE VERSION ---
+Remplacez TOUS les fichiers du dépôt GitHub (y compris package.json : une nouvelle
+dépendance "multer" est nécessaire). Render réinstalle tout seul. Si la base existe
+encore, elle est migrée automatiquement : les anciens guides restent publiés et leur
+texte devient des étapes modifiables.
+
+--- ATTENTION : DONNÉES SUR RENDER GRATUIT ---
+Sur l'offre gratuite, le disque est effacé à chaque redéploiement et peut l'être au
+redémarrage : comptes, guides, PHOTOS ET VIDÉOS disparaissent. Pour conserver les données :
+offre payante + Disk (Advanced -> Add Disk, Mount Path /var/data) et la variable
+     DB_PATH = /var/data/site.db
+(la base et le dossier uploads sont alors stockés sur le disque). Les vidéos prennent de
+la place : choisissez la taille du disque en conséquence. Tarifs : render.com/pricing
+
+--- UTILISATION ---
+Rôles : Lecteur (commente) | Créateur (crée ses guides) | Modérateur (valide les guides,
+supprime commentaires/guides, suspend des lecteurs) | Administrateur (tout + catégories + rôles).
+Créer un guide : bouton "Créer un guide". Titre, introduction, puis étapes : chaque étape a un
+titre, un texte et des photos/vidéos (JPG, PNG, WebP, GIF, MP4, WebM). Boutons pour monter,
+descendre ou supprimer une étape. À droite : catégorie, difficulté, durée, couverture, outils.
+Validation : les guides des créateurs sont "En attente" jusqu'à validation (menu "Validation").
+Un guide modifié par son créateur repasse en validation. Les modérateurs et admins publient
+directement. Sous-catégories : Administration -> "Sous-catégorie de : ...".
+
+--- ICÔNES DE CATÉGORIES ---
+Administration -> Catégories : à la création, saisissez un emoji (ex : 📱) OU envoyez une image
+(JPG, PNG, WebP, GIF) qui sert d'icône. Pour une catégorie existante : lien "Icône" à côté de
+son nom (changer, remplacer, retirer). L'image est prioritaire sur l'emoji. Sans icône, la
+première lettre du nom s'affiche. L'icône apparaît sur l'accueil, les pages de catégories et
+comme vignette des guides sans photo.
+
+--- LOGO, ICÔNE DU SITE, TÉLÉPHONE ---
+Le logo (clé à molette bleue) s'affiche dans l'en-tête et dans l'onglet du navigateur (favicon).
+Il sert aussi d'icône quand on ajoute le site à l'écran d'accueil d'un téléphone.
+Pour mettre votre propre logo, remplacez dans le dossier "public" : logo.svg (en-tête),
+favicon-32.png, favicon.ico, apple-touch-icon.png (180x180), icon-192.png et icon-512.png.
+Le site s'adapte à l'ordinateur, à la tablette et au téléphone : menu du compte déroulant,
+recherche sur toute la largeur, éditeur et pages de guide en une colonne sur mobile.
+
+--- FICHIERS JOINTS PAR ÉTAPE ---
+Dans l'éditeur, chaque étape a deux zones : "Photos et vidéos" et "Fichiers joints"
+(PDF, ZIP, 7z, TXT, CSV, MD, DOCX, XLSX, PPTX, ODT, ODS, ODP, STL, 3MF, STEP, STP, DXF).
+Les visiteurs les téléchargent depuis la page du guide. Un fichier d'un guide non validé n'est
+accessible qu'à son auteur, aux modérateurs et aux admins. Les fichiers sont toujours
+téléchargés (jamais ouverts dans le navigateur) et leur contenu est vérifié (PDF, ZIP, Office).
+
+--- RENDER 100 % GRATUIT : CE QUI MARCHE ET CE QUI NE MARCHE PAS ---
+Vérifié dans la documentation Render (render.com/docs/free) :
+ - Déployer un Web Service depuis GitHub : GRATUIT (offre Free, 750 heures par mois).
+ - Le service s'endort après 15 minutes sans visite (réveil d'environ 1 minute).
+ - Le disque est EPHÉMÈRE : comptes, guides, photos, vidéos et fichiers (SQLite et uploads)
+   sont perdus à chaque redéploiement, redémarrage ou mise en veille.
+ - Le disque persistant n'existe que sur les offres payantes. La base Postgres gratuite de
+   Render expire au bout de 30 jours.
+Donc : gratuit pour tester et faire une démo, PAS pour garder des données durablement.
+Pistes pour la suite : (1) Render payant avec Disk + DB_PATH=/var/data/site.db ;
+(2) base Postgres + stockage de fichiers gratuits chez un autre service (demande une
+adaptation du code) ; (3) un hébergeur avec disque gratuit ; (4) garder le site sur votre PC.
+Astuce démo : variables ADMIN_EMAIL + ADMIN_PASSWORD pour retrouver l'admin à chaque réveil.
+
+--- PARTAGER DES FICHIERS AVEC ARCHIVE.ORG (gros fichiers, ZIP, vidéos) ---
+Le site peut afficher des fichiers hébergés sur archive.org : vous les envoyez là-bas, puis
+vous collez simplement leur lien dans l'étape. Rien n'est stocké sur votre serveur.
+1. Créez un compte gratuit sur https://archive.org
+2. Menu "Upload" (archive.org/create) : choisissez votre fichier, remplissez titre et description,
+   validez. Attendez la fin du traitement.
+3. Ouvrez la page de votre élément (archive.org/details/IDENTIFIANT). Dans "Download options",
+   faites un clic droit sur le fichier -> "Copier l'adresse du lien". Il ressemble à :
+   https://archive.org/download/IDENTIFIANT/nom-du-fichier.zip
+4. Dans l'éditeur du guide, à l'étape voulue, zone "Liens archive.org" : collez le lien, puis
+   (facultatif) un nom après un espace. Un lien par ligne.
+Résultat sur la page du guide :
+ - lien vers une image (jpg, png, webp, gif) : l'image s'affiche dans l'étape ;
+ - lien vers une vidéo (mp4, webm) : lecteur vidéo dans l'étape ;
+ - tout autre lien (zip, pdf, page archive.org) : carte "Ouvrir" qui s'ouvre dans un nouvel onglet.
+Sécurité : seuls les liens https vers archive.org sont acceptés (les autres sont refusés avec un
+message). Pour autoriser d'autres sites, variable ALLOWED_LINK_HOSTS (ex : exemple.org,autre.fr).
+Attention : tout ce que vous mettez sur archive.org est PUBLIC, et ses règles d'utilisation
+s'appliquent (consultez-les avant d'y envoyer des fichiers). Sur Render gratuit, les fichiers
+restent sur archive.org même si le site redémarre, mais les guides et leurs liens (base de
+données du site) sont perdus : il faut les recréer.
+
+--- HASHTAGS ---
+Dans l'éditeur de guide (colonne de droite) : champ "Hashtags", par exemple  #batterie #iphone #ecran
+(10 maximum ; accents, majuscules et doublons sont nettoyés). Sur le site :
+ - chaque hashtag d'un guide est cliquable et ouvre la page /tag/nom avec tous les guides publiés ;
+ - la recherche accepte #hashtag (recherche exacte sur les hashtags) ou un mot (titre, texte et hashtags) ;
+ - l'accueil affiche les hashtags les plus utilisés ; les cartes de guides montrent leurs 3 premiers hashtags.
+
+--- OUTIL DE DIAGNOSTIC DE PANNE ---
+Menu "Diagnostic" (ou bouton sur l'accueil). Le visiteur répond à des questions une par une ;
+l'outil affiche la cause probable, puis propose automatiquement les guides qui portent les
+hashtags du résultat. Boutons "Question précédente" et "Recommencer" ; l'adresse de chaque étape
+peut être partagée. 3 outils d'exemple sont ajoutés au premier démarrage (smartphone, ordinateur
+portable, lave-linge) : modifiables ou supprimables (ils ne reviennent pas).
+Créer son outil (créateurs, modérateurs, admins) : "Diagnostic" -> "Créer un outil de diagnostic".
+On écrit l'arbre en texte simple :
+   [debut] Ça s'allume ?
+   - Oui -> ecran
+   - Non -> = Vérifiez le câble de charge. #chargeur
+   [ecran] L'écran est-il fissuré ?
+   - Oui -> = Remplacez l'écran. #ecran
+   - Non -> = Faites un diagnostic en atelier.
+ - [repere] = une étape (la première est le départ) ; "- Réponse -> repere" mène à une autre étape ;
+   "- Réponse -> = Texte" mène directement à un résultat ; "[repere] = Texte" crée un résultat réutilisable.
+ - Les #hashtags d'un résultat servent à proposer les guides correspondants.
+ - Le site vérifie l'arbre à l'enregistrement et indique la ligne de chaque erreur.
+Les outils des créateurs sont validés par un modérateur ou un admin, comme les guides
+(menu "Validation"). Les modérateurs et admins publient directement.
+
+--- ARTICLES DE RÉPARATION DANS LES DIAGNOSTICS ---
+Un résultat de diagnostic peut proposer des articles de réparation. Après le texte du résultat,
+séparez avec le signe | :
+   - Oui -> = Changez la batterie. #batterie | guide: 12 | lien: https://exemple.fr/article Remplacer la batterie
+ - guide: 12 = un guide de ce site (son numéro est dans son adresse : /guide/12) ; l'adresse complète
+   du guide fonctionne aussi. Seuls les guides publiés s'affichent.
+ - lien: https://... Titre = un article externe (adresse https obligatoire ; le titre est facultatif).
+Pour un résultat écrit sur plusieurs lignes ([repere] = ...), mettez chaque "lien:" ou "guide:" sur sa
+propre ligne. Jusqu'à 6 liens par résultat. Ces articles s'affichent d'abord ("Articles de réparation
+recommandés"), puis les autres guides trouvés grâce aux hashtags. Les liens externes s'ouvrent dans un
+nouvel onglet. Les outils des créateurs sont validés par un modérateur, qui vérifie aussi les liens.
+
+--- ICÔNE DU SITE ET TÉLÉPHONE ---
+Icône d'onglet redessinée (clé plus grosse et plus épaisse, lisible à 16 pixels) : favicon.svg et
+favicon.ico dans "public". Si l'ancienne icône reste affichée, rechargez la page avec Ctrl+F5.
+Sur téléphone : barre de navigation en bas (Accueil, Diagnostic, Créer, Validation, Compte), en-tête
+allégé, boutons plus faciles à toucher, lien "Aller au contenu" pour les lecteurs d'écran.

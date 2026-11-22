@@ -1,0 +1,24 @@
+<%- include('_head') %>
+<h1><%= d.id ? "Modifier l'outil de diagnostic" : 'Nouvel outil de diagnostic' %></h1>
+<% if (user.role === 'creator') { %><div class="banner warnb">Votre outil sera publié après validation par un modérateur.</div><% } %>
+<% if (errors.length) { %><div class="banner badb" style="display:block"><b>À corriger avant d'enregistrer :</b><ul class="errs"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div><% } %>
+<div class="cols"><form method="post" action="<%= d.id ? '/diag/' + d.id + '/edit' : '/diag/new' %>">
+<input class="big" name="title" required maxlength="150" placeholder="Titre (ex : Mon imprimante n'imprime plus)" value="<%= d.title || '' %>">
+<label>Catégorie</label><select name="category_id"><option value="">Sans catégorie</option><% cats.forEach(c => { %><option value="<%= c.id %>" <%= d.category_id == c.id ? 'selected' : '' %>><%= c.label %></option><% }) %></select>
+<label>Introduction</label><textarea name="intro" rows="2" maxlength="600" placeholder="À quoi sert cet outil ?"><%= d.intro || '' %></textarea>
+<label>Questions et réponses</label><textarea class="mono" name="tree" rows="22" required spellcheck="false" placeholder="[debut] Votre première question ?&#10;- Réponse A -> suite&#10;- Réponse B -> = Résultat possible #hashtag"><%= d.tree || '' %></textarea>
+<p><button>Enregistrer</button> <% if (d.id) { %><a class="btn secondary" href="/diag/<%= d.id %>">Tester l'outil</a><% } %></p></form>
+<aside class="side"><div class="box"><h3>Comment écrire l'arbre</h3>
+<p class="small">Chaque étape commence par un <b>repère</b> entre crochets. La première est le départ. Chaque réponse commence par un tiret, puis <b>-&gt; repère</b> pour continuer, ou <b>-&gt; =</b> suivi d'un résultat.</p>
+<pre class="mono small" style="white-space:pre-wrap;margin:0">[debut] Ça s'allume ?
+- Oui -> ecran
+- Non -> = Vérifiez le câble. #chargeur
+
+[ecran] L'écran est-il fissuré ?
+- Oui -> = Remplacez l'écran. #ecran
+- Non -> = Faites un diagnostic en atelier.</pre>
+<p class="small">Les <b>#hashtags</b> d'un résultat affichent automatiquement les guides qui portent le même hashtag.</p>
+<p class="small" style="margin-bottom:.3rem"><b>Ajouter des articles de réparation</b> : après le texte du résultat, séparez avec <b>|</b> :</p>
+<pre class="mono small" style="white-space:pre-wrap;margin:0">- Oui -> = Changez la batterie. #batterie | guide: 12 | lien: https://exemple.fr/article Remplacer la batterie</pre>
+<p class="small" style="margin-bottom:0"><b>guide: 12</b> = un guide de ce site (son numéro est dans son adresse, /guide/12). <b>lien:</b> = une page externe en https, avec un titre facultatif. Pour un résultat sur plusieurs lignes, mettez chaque <b>lien:</b> ou <b>guide:</b> sur sa propre ligne.</p></div></aside></div>
+<%- include('_foot') %>

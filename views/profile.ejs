@@ -1,0 +1,3 @@
+<%- include('_head') %><h1><%= p.name %></h1><p class="mut"><%= roles[p.role] %> · membre depuis le <%= String(p.created_at).slice(0, 10) %></p>
+<h2>Guides publiés (<%= guides.length %>)</h2><% if (!guides.length) { %><p class="mut">Aucun guide publié.</p><% } %>
+<div class="grid"><% guides.forEach(g => { %><%- include('_card', { g }) %><% }) %></div><%- include('_foot') %>
